@@ -1,6 +1,7 @@
 // Titik masuk aplikasi: menjalankan server Express dan melayani halaman inventaris.
-// Tahap 1: kerangka + daftar stok saja. Barang masuk/keluar, stok menipis
-// yang lebih detail, dan supplier dibuat di tahap berikutnya.
+// Tahap 1: kerangka + daftar stok. Tahap 2 potongan 1: endpoint barang
+// masuk/keluar + riwayat sudah jalan, formulir di halaman menyusul.
+// Stok menipis yang lebih detail dan supplier dibuat di tahap berikutnya.
 require('dotenv').config();
 const express = require('express');
 const path = require('path');

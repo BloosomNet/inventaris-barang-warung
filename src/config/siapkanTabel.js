@@ -13,6 +13,17 @@ const buatTabel = [
     kategori VARCHAR(50),
     dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
+  // Tiap barang masuk/keluar dicatat di sini, supaya ketahuan stok
+  // berubah karena apa dan kapan. jenis cuma 'masuk' atau 'keluar'.
+  `CREATE TABLE IF NOT EXISTS riwayat_stok (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    produk_id INT NOT NULL,
+    jenis ENUM('masuk', 'keluar') NOT NULL,
+    jumlah INT NOT NULL,
+    harga_beli INT NULL,
+    keterangan VARCHAR(255) NULL,
+    dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
 ];
 
 // Coba bikin tabel, kalau basis data belum siap (misal MySQL Railway
