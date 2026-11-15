@@ -1,0 +1,1 @@
+{"dependencies":{"dotenv":"^16.4.5","express":"^4.19.2","mysql2":"^3.10.1"},"description":"Inventaris barang warung: pantau stok, barang masuk dan keluar, stok menipis, dan supplier","main":"server.js","name":"inventaris-barang-warung","scripts":{"dev":"node server.js","start":"node server.js"},"version":"0.1.0"}

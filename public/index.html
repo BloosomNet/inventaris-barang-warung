@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventaris Barang Warung</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="wadah">
+    <h1>Inventaris Barang Warung</h1>
+    <p class="keterangan">Pantau stok barang di warung: mana yang masih aman, mana yang mulai menipis, dan mana yang sudah habis.</p>
+
+    <div class="ringkasan" id="ringkasan">
+      <div class="kartu-angka">
+        <span class="angka" id="total-produk">–</span>
+        <span class="label-angka">Jenis barang</span>
+      </div>
+      <div class="kartu-angka">
+        <span class="angka" id="total-stok">–</span>
+        <span class="label-angka">Total stok</span>
+      </div>
+      <div class="kartu-angka peringatan">
+        <span class="angka" id="stok-menipis">–</span>
+        <span class="label-angka">Stok menipis</span>
+      </div>
+      <div class="kartu-angka bahaya">
+        <span class="angka" id="stok-habis">–</span>
+        <span class="label-angka">Stok habis</span>
+      </div>
+    </div>
+
+    <div class="kartu">
+      <div class="saringan" id="saringan">
+        <button class="tombol-saring aktif" data-saring="">Semua</button>
+        <button class="tombol-saring" data-saring="menipis">Menipis</button>
+        <button class="tombol-saring" data-saring="habis">Habis</button>
+      </div>
+      <p id="pesan" class="pesan"></p>
+      <table class="tabel">
+        <thead>
+          <tr>
+            <th>Barang</th>
+            <th>Kategori</th>
+            <th>Harga</th>
+            <th>Stok</th>
+          </tr>
+        </thead>
+        <tbody id="daftar-stok"></tbody>
+      </table>
+      <p id="kosong" class="keterangan" hidden>Belum ada barang di sini.</p>
+    </div>
+
+    <p class="keterangan">Barang masuk dan keluar, plus daftar supplier, menyusul di tahap berikutnya.</p>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

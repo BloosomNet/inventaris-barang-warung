@@ -1,0 +1,139 @@
+/* Tampilan inventaris barang warung: sederhana, rapi di HP, tombol gampang diketuk. */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #f6f4ef;
+  color: #26221c;
+  line-height: 1.5;
+}
+
+.wadah {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+h1 {
+  font-size: 26px;
+  margin: 8px 0 4px;
+}
+
+.keterangan {
+  color: #6b645a;
+  margin: 4px 0 16px;
+}
+
+.pesan {
+  color: #6b645a;
+  min-height: 1.2em;
+}
+
+/* Kartu angka ringkasan di atas halaman. */
+.ringkasan {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.kartu-angka {
+  background: #fffdf8;
+  border: 1px solid #e5ded0;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+.kartu-angka .angka {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.kartu-angka .label-angka {
+  font-size: 13px;
+  color: #6b645a;
+}
+
+.kartu-angka.peringatan .angka { color: #b7791f; }
+.kartu-angka.bahaya .angka { color: #c0392b; }
+
+/* Kartu berisi saringan dan tabel. */
+.kartu {
+  background: #fffdf8;
+  border: 1px solid #e5ded0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.saringan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tombol-saring {
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid #d8d0c0;
+  border-radius: 999px;
+  background: #fffdf8;
+  color: #26221c;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.tombol-saring.aktif {
+  background: #2e7d32;
+  border-color: #2e7d32;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Tabel stok. */
+.tabel {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.tabel th,
+.tabel td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #eee7d8;
+  text-align: left;
+}
+
+.tabel th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b645a;
+}
+
+.tabel tr:last-child td { border-bottom: none; }
+
+/* Warna stok: menipis kuning tebal, habis merah tebal. */
+.stok-menipis {
+  color: #b7791f;
+  font-weight: 700;
+}
+
+.stok-habis {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+/* Layar kecil: kartu angka jadi dua kolom, tabel hurufnya lebih kecil. */
+@media (max-width: 600px) {
+  .wadah { padding: 12px 12px 32px; }
+  h1 { font-size: 22px; }
+  .ringkasan { grid-template-columns: repeat(2, 1fr); }
+  .kartu { padding: 12px; }
+  .tabel { font-size: 14px; }
+  .tabel th,
+  .tabel td { padding: 8px 6px; }
+}
