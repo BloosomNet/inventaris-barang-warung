@@ -53,11 +53,40 @@ Yang sudah diuji (basis data MariaDB/MySQL lokal, server di port 3002):
 - Data uji dibersihkan, tabel produk dan riwayat kembali kosong
 
 Kekurangan saat ini (jujur):
-- Formulir barang masuk/keluar di halaman belum ada — itu potongan 2.
-- Riwayat baru bisa dilihat lewat endpoint, belum tampil di halaman — itu juga potongan 2.
+- Formulir barang masuk/keluar di halaman sudah dibuat di potongan 2 (di bawah).
+- Riwayat sudah tampil di halaman — itu juga potongan 2.
 - Belum ada data supplier — itu Tahap 4.
 - Belum ada kolom pencarian dan belum ter-deploy.
 - Catatan: repo GitHub `BloosomNet/inventaris-barang-warung` sudah dibuat 2026-11-15 09:38 WIB lewat browser (publik, kosong, tanpa README awal). Push pertama sempat gagal 404 jam 09:xx WIB karena repo belum ada waktu itu; bikin repo lewat API juga gagal 403 ("Resource not accessible by integration").
+
+## Tahap 2 (potongan 2 — selesai): Formulir barang masuk/keluar + riwayat di halaman
+
+Yang dibuat kali ini:
+- Formulir di `public/index.html`: pilih barang (dropdown), jenis masuk/keluar, jumlah, harga beli, keterangan. Harga beli cuma muncul kalau jenisnya masuk — kalau keluar, kolomnya disembunyiin biar nggak bingung.
+- Logika di `public/js/app.js`: dropdown barang diisi dari `/api/stok` (semua barang, termasuk yang stoknya habis); kirim ke `POST /api/stok/masuk` atau `/api/stok/keluar` sesuai jenis yang dipilih. Kalau berhasil muncul pesan hijau berisi stok barunya, formulir ke-reset, terus ringkasan, tabel stok, pilihan barang, dan riwayat dimuat ulang. Kalau gagal (misalnya stok kurang buat barang keluar) muncul pesan merah dari server.
+- Tabel riwayat di bawah tabel stok: waktu, barang, jenis (Masuk hijau / Keluar merah), jumlah, harga beli, keterangan. Diambil dari `GET /api/stok/riwayat`, paling baru dulu. Nama barang dan keterangan diamankan dulu sebelum ditempel ke halaman, biar tanda `<` `>` dari ketikan pengguna nggak kebaca sebagai HTML.
+- Gaya baru di `public/css/style.css`: formulir dua kolom (jadi satu kolom di HP), kolom isian setinggi 44px, tombol utama hijau, pesan berhasil hijau dan gagal merah, label jenis masuk/keluar. Antar kartu dikasih jarak.
+- Catatan di bawah halaman diubah: sekarang tinggal "Daftar supplier menyusul di tahap berikutnya."
+
+Cara kerja singkat:
+- Pemilik pilih barang, jenis, jumlah, lalu simpan. Peramban kirim ke endpoint masuk/keluar yang dibuat di potongan 1 — server yang mengubah stok dan mencatat riwayatnya dalam satu transaksi. Sesudah berhasil, halaman memuat ulang datanya sendiri, jadi stok baru dan baris riwayat langsung kelihatan tanpa muat ulang halaman.
+
+Yang sudah diuji (basis data MariaDB/MySQL lokal, server di port 3002):
+- Data uji: Kopi Sachet Rp5.000 (stok 20), Gula 1kg Rp17.000 (stok 3)
+- `POST /api/stok/masuk` Kopi +10, harga beli 4500, keterangan "Toko Sinar" — 201, stok jadi 30
+- `POST /api/stok/keluar` Gula -2, keterangan "rusak" — 201, stok jadi 1
+- `POST /api/stok/keluar` Gula -5 ditolak 400 "Stok tidak cukup", stok tetap 1
+- `GET /api/stok/riwayat` mengembalikan 2 baris, paling baru dulu, lengkap dengan nama produk, harga beli, dan keterangan
+- `GET /api/stok/ringkasan` benar: total produk 2, total stok 31, menipis 1, habis 0
+- Halaman `/`, `/css/style.css`, `/js/app.js`, `/api/sehat`, dan `/api/stok/ringkasan` dimuat HTTP 200; semua elemen formulir dan tabel riwayat ada di halaman; CSS baru ikut tersaji; tidak ada error di log server
+- Catatan: MariaDB lokal mati lagi sebelum uji — dinyalakan dulu, lalu db `inventaris_warung` + pengguna `inventaris` dibuat ulang dari `.env` lokal karena ikut hilang. Bukan masalah kode.
+- Data uji dibersihkan, tabel produk dan riwayat kembali kosong
+
+Kekurangan saat ini (jujur):
+- Riwayat cuma menampilkan 100 baris terbaru, belum bisa disaring per barang dari halaman (endpointnya sudah bisa `?produk_id=`, tampilannya belum).
+- Belum ada data supplier — itu Tahap 4.
+- Belum ada kolom pencarian dan belum ter-deploy.
+- Klik tombol simpan di peramban sungguhan belum diuji — yang diuji endpointnya lewat curl dan elemen halamannya; alur kirim formulirnya memakai fetch yang sama seperti di kode.
 
 ## Rencana gabung dengan project lain
 
@@ -70,4 +99,4 @@ Project ini dirancang supaya nanti bisa digabung dengan aplikasi kasir warung da
 
 ## Tahap berikutnya
 
-Tahap 2 (potongan 2): Formulir barang masuk/keluar di halaman inventaris (pilih produk, isi jumlah, harga beli, keterangan) dan tampilkan riwayat pergerakan stok di bawah tabel — pakai endpoint yang sudah dibuat di potongan 1.
+Tahap 3: Peringatan stok menipis yang lebih jelas — barang yang perlu segera dibeli lagi ditampilkan menonjol di atas halaman, bukan cuma warna di tabel.

@@ -51,7 +51,60 @@
       <p id="kosong" class="keterangan" hidden>Belum ada barang di sini.</p>
     </div>
 
-    <p class="keterangan">Barang masuk dan keluar, plus daftar supplier, menyusul di tahap berikutnya.</p>
+    <div class="kartu">
+      <h2>Catat barang masuk / keluar</h2>
+      <p class="keterangan">Barang masuk nambah stok (misalnya habis belanja ke supplier), barang keluar ngurangin stok (misalnya rusak atau dipakai sendiri).</p>
+      <form id="form-pergerakan" class="formulir">
+        <label class="kolom">
+          <span>Barang</span>
+          <select id="pilih-produk" required>
+            <option value="">Pilih barang dulu</option>
+          </select>
+        </label>
+        <label class="kolom">
+          <span>Jenis</span>
+          <select id="pilih-jenis">
+            <option value="masuk">Masuk</option>
+            <option value="keluar">Keluar</option>
+          </select>
+        </label>
+        <label class="kolom">
+          <span>Jumlah</span>
+          <input type="number" id="jumlah" min="1" step="1" placeholder="misal 10" required>
+        </label>
+        <label class="kolom" id="kolom-harga-beli">
+          <span>Harga beli (khusus masuk, boleh kosong)</span>
+          <input type="number" id="harga-beli" min="0" step="1" placeholder="misal 4500">
+        </label>
+        <label class="kolom">
+          <span>Keterangan (boleh kosong)</span>
+          <input type="text" id="keterangan" maxlength="100" placeholder="nama supplier, atau alasan keluar">
+        </label>
+        <button type="submit" class="tombol-utama">Simpan</button>
+      </form>
+      <p id="pesan-form" class="pesan"></p>
+    </div>
+
+    <div class="kartu">
+      <h2>Riwayat pergerakan stok</h2>
+      <p id="pesan-riwayat" class="pesan"></p>
+      <table class="tabel">
+        <thead>
+          <tr>
+            <th>Waktu</th>
+            <th>Barang</th>
+            <th>Jenis</th>
+            <th>Jumlah</th>
+            <th>Harga beli</th>
+            <th>Keterangan</th>
+          </tr>
+        </thead>
+        <tbody id="daftar-riwayat"></tbody>
+      </table>
+      <p id="riwayat-kosong" class="keterangan" hidden>Belum ada barang masuk atau keluar.</p>
+    </div>
+
+    <p class="keterangan">Daftar supplier menyusul di tahap berikutnya.</p>
   </div>
 
   <script src="/js/app.js"></script>
