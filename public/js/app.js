@@ -13,8 +13,21 @@ const pesanForm = document.getElementById('pesan-form');
 const daftarRiwayat = document.getElementById('daftar-riwayat');
 const pesanRiwayat = document.getElementById('pesan-riwayat');
 const riwayatKosong = document.getElementById('riwayat-kosong');
+const kartuPeringatan = document.getElementById('kartu-peringatan');
+const daftarPeringatan = document.getElementById('daftar-peringatan');
+const stokAman = document.getElementById('stok-aman');
+const kolomCari = document.getElementById('cari');
+const formSupplier = document.getElementById('form-supplier');
+const pesanSupplier = document.getElementById('pesan-supplier');
+const daftarSupplier = document.getElementById('daftar-supplier');
+const supplierKosong = document.getElementById('supplier-kosong');
+const formTautan = document.getElementById('form-tautan');
+const pesanTautan = document.getElementById('pesan-tautan');
+const tautanSupplier = document.getElementById('tautan-supplier');
+const tautanProduk = document.getElementById('tautan-produk');
 
 let saringAktif = '';
+let cariAktif = '';
 
 // Teks dari pengguna (nama barang, keterangan) jangan langsung ditempel
 // ke halaman — diamankan dulu biar tanda < > nggak kebaca sebagai HTML.
@@ -47,7 +60,10 @@ async function muatRingkasan() {
 // Stok 0 ditulis merah tebal, stok 1-5 kuning tebal, sisanya biasa.
 async function muatStok() {
   pesan.textContent = 'Memuat...';
-  const alamat = saringAktif ? `/api/stok?saring=${saringAktif}` : '/api/stok';
+  const parameter = new URLSearchParams();
+  if (saringAktif) parameter.set('saring', saringAktif);
+  if (cariAktif) parameter.set('cari', cariAktif);
+  const alamat = parameter.toString() ? `/api/stok?${parameter}` : '/api/stok';
   const res = await fetch(alamat);
   if (!res.ok) {
     pesan.textContent = 'Gagal mengambil daftar stok, coba muat ulang halaman.';
@@ -57,6 +73,9 @@ async function muatStok() {
   pesan.textContent = '';
   daftarStok.innerHTML = '';
   kosong.hidden = data.produk.length > 0;
+  kosong.textContent = cariAktif
+    ? `Tidak ada barang yang cocok dengan "${cariAktif}".`
+    : 'Belum ada barang di sini.';
 
   data.produk.forEach((p) => {
     const baris = document.createElement('tr');
@@ -64,8 +83,8 @@ async function muatStok() {
     if (p.stok === 0) kelasStok = 'stok-habis';
     else if (p.stok <= data.batasMenipis) kelasStok = 'stok-menipis';
     baris.innerHTML =
-      `<td>${p.nama}</td>` +
-      `<td>${p.kategori || '–'}</td>` +
+      `<td>${amankanTeks(p.nama)}</td>` +
+      `<td>${amankanTeks(p.kategori || '–')}</td>` +
       `<td>${formatRupiah(p.harga)}</td>` +
       `<td class="${kelasStok}">${p.stok}</td>`;
     daftarStok.appendChild(baris);
@@ -145,9 +164,11 @@ formPergerakan.addEventListener('submit', async (e) => {
   formPergerakan.reset();
   aturKolomHargaBeli();
   muatRingkasan();
+  muatPeringatan();
   muatStok();
   muatPilihanProduk();
   muatRiwayat();
+  muatPilihanTautan();
 });
 
 // Mengambil riwayat pergerakan stok (paling baru dulu) lalu mengisi tabel.
@@ -184,8 +205,130 @@ async function muatRiwayat() {
   });
 }
 
+// Daftar perlu dibeli: barang habis/menipis ditampilkan menonjol di atas,
+// dari yang stoknya paling kecil. Kalau tidak ada, tampilkan kabar aman.
+async function muatPeringatan() {
+  const res = await fetch('/api/stok/perlu-dibeli');
+  if (!res.ok) return;
+  const data = await res.json();
+  daftarPeringatan.innerHTML = '';
+  kartuPeringatan.hidden = data.produk.length === 0;
+  stokAman.hidden = data.produk.length > 0;
+  data.produk.forEach((p) => {
+    const item = document.createElement('li');
+    const habis = p.stok === 0;
+    item.innerHTML =
+      `<span class="lencana ${habis ? 'lencana-habis' : 'lencana-menipis'}">${habis ? 'Habis' : 'Menipis'}</span>` +
+      `<strong>${amankanTeks(p.nama)}</strong>` +
+      `<span class="sisa">sisa ${p.stok}</span>`;
+    daftarPeringatan.appendChild(item);
+  });
+}
+
+// Pencarian: permintaan baru dikirim 300 ms sesudah berhenti mengetik,
+// supaya server tidak dibanjiri tiap ketikan. Sama seperti di kasir.
+let jedaCari = null;
+kolomCari.addEventListener('input', () => {
+  clearTimeout(jedaCari);
+  jedaCari = setTimeout(() => {
+    cariAktif = kolomCari.value.trim();
+    muatStok();
+  }, 300);
+});
+
+// Daftar supplier beserta barang yang disuplai masing-masing.
+async function muatSupplier() {
+  const res = await fetch('/api/supplier');
+  if (!res.ok) return;
+  const data = await res.json();
+  daftarSupplier.innerHTML = '';
+  supplierKosong.hidden = data.supplier.length > 0;
+  const dipilih = tautanSupplier.value;
+  tautanSupplier.innerHTML = '<option value="">Pilih supplier dulu</option>';
+  data.supplier.forEach((s) => {
+    const kartu = document.createElement('div');
+    kartu.className = 'kartu-supplier';
+    kartu.innerHTML =
+      `<strong>${amankanTeks(s.nama)}</strong>` +
+      (s.kontak ? `<span class="kontak">${amankanTeks(s.kontak)}</span>` : '') +
+      `<span class="suplai">${s.nama_produk ? 'Menyuplai: ' + amankanTeks(s.nama_produk) : 'Belum ada barang yang dihubungkan.'}</span>`;
+    daftarSupplier.appendChild(kartu);
+    const pilihan = document.createElement('option');
+    pilihan.value = s.id;
+    pilihan.textContent = s.nama;
+    tautanSupplier.appendChild(pilihan);
+  });
+  if (dipilih) tautanSupplier.value = dipilih;
+}
+
+// Pilihan barang di formulir hubungkan supplier: isinya sama seperti
+// pilihan barang di formulir pergerakan, diambil dari /api/stok.
+async function muatPilihanTautan() {
+  const res = await fetch('/api/stok');
+  if (!res.ok) return;
+  const data = await res.json();
+  tautanProduk.innerHTML = '<option value="">Pilih barang dulu</option>';
+  data.produk.forEach((p) => {
+    const pilihan = document.createElement('option');
+    pilihan.value = p.id;
+    pilihan.textContent = p.nama;
+    tautanProduk.appendChild(pilihan);
+  });
+}
+
+// Tambah supplier baru lewat POST /api/supplier.
+formSupplier.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  pesanSupplier.textContent = 'Menyimpan...';
+  pesanSupplier.className = 'pesan';
+  const res = await fetch('/api/supplier', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      nama: document.getElementById('supplier-nama').value.trim(),
+      kontak: document.getElementById('supplier-kontak').value.trim() || null,
+      alamat: document.getElementById('supplier-alamat').value.trim() || null,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    pesanSupplier.textContent = data.pesan || 'Gagal menambah supplier.';
+    pesanSupplier.classList.add('pesan-gagal');
+    return;
+  }
+  pesanSupplier.textContent = data.pesan + ': ' + data.supplier.nama + '.';
+  pesanSupplier.classList.add('pesan-berhasil');
+  formSupplier.reset();
+  muatSupplier();
+});
+
+// Hubungkan supplier dengan barang yang disuplainya.
+formTautan.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  pesanTautan.textContent = 'Menyimpan...';
+  pesanTautan.className = 'pesan';
+  const res = await fetch(`/api/supplier/${tautanSupplier.value}/produk`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ produk_id: Number(tautanProduk.value) }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    pesanTautan.textContent = data.pesan || 'Gagal menghubungkan.';
+    pesanTautan.classList.add('pesan-gagal');
+    return;
+  }
+  pesanTautan.textContent = data.pesan + '.';
+  pesanTautan.classList.add('pesan-berhasil');
+  formTautan.reset();
+  muatSupplier();
+});
+
 muatRingkasan();
+muatPeringatan();
 muatStok();
 muatPilihanProduk();
 aturKolomHargaBeli();
 muatRiwayat();
+muatSupplier();
+muatPilihanTautan();

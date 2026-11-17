@@ -100,3 +100,56 @@ Project ini dirancang supaya nanti bisa digabung dengan aplikasi kasir warung da
 ## Tahap berikutnya
 
 Tahap 3: Peringatan stok menipis yang lebih jelas — barang yang perlu segera dibeli lagi ditampilkan menonjol di atas halaman, bukan cuma warna di tabel.
+
+## Tahap 3 — Selesai: Peringatan stok menipis yang lebih jelas
+
+Yang dibuat kali ini:
+- Model `src/models/Produk.js`: fungsi baru `perluDibeli` — produk yang stoknya habis atau menipis (stok ≤ batas menipis), diurutkan dari stok paling kecil, jadi yang paling mendesak paling atas.
+- Endpoint baru `GET /api/stok/perlu-dibeli` di `src/controllers/stokController.js` + `src/routes/stok.js`, menjawab daftarnya plus batas menipisnya.
+- Kartu "⚠️ Perlu dibeli lagi" di `public/index.html` tepat di bawah kartu angka: tiap barang ditulis dengan lencana Habis (merah) atau Menipis (kuning) dan sisa stoknya. Kalau tidak ada yang perlu dibeli, kartunya disembunyikan dan diganti tulisan "Semua stok masih aman".
+- Logika `muatPeringatan` di `public/js/app.js`, dimuat ulang tiap barang masuk/keluar berhasil dicatat. Nama barang diamankan dulu sebelum ditempel ke halaman, seperti di tabel lain.
+- Gaya kartu peringatan di `public/css/style.css`: tepi kuning tegas dan latar krem, biar langsung kelihatan beda dari kartu biasa.
+
+Cara kerja singkat:
+- Peramban meminta `GET /api/stok/perlu-dibeli` saat halaman dibuka. Server menyaring produk dengan stok ≤ 5 di basis data dan mengurutkannya dari yang paling kecil, lalu peramban menampilkannya sebagai daftar peringatan.
+
+## Tahap 4 — Selesai: Supplier sederhana
+
+Yang dibuat kali ini:
+- Dua tabel baru di `database/schema.sql` dan `src/config/siapkanTabel.js` (jadi kebikin otomatis pas server nyala): `supplier` (nama, kontak, alamat) dan `supplier_produk` (hubungan supplier dengan produk, satu pasangan cuma boleh sekali lewat kunci unik). Tabel `produk` tidak diubah, supaya tetap sama dengan kasir dan katalog.
+- Model baru `src/models/Supplier.js`: `semua` (lengkap dengan jumlah barang dan nama barang yang disuplai, diambil dengan GROUP_CONCAT), `cariBerdasarkanId`, `tambah`, dan `tautkan` (INSERT IGNORE, jadi menghubungkan dua kali tidak dobel; produk yang tidak ada dijawab dengan kode galat khusus).
+- Pengatur baru `src/controllers/supplierController.js` dan rute `src/routes/supplier.js` (didaftarkan di `server.js`): `GET /api/supplier`, `POST /api/supplier` (nama wajib diisi, 400 kalau kosong; kontak dan alamat boleh kosong), dan `POST /api/supplier/:id/produk` (404 kalau supplier atau produknya tidak ada).
+- Bagian Supplier di `public/index.html`: formulir tambah supplier, daftar supplier beserta barang yang disuplai masing-masing, dan formulir hubungkan supplier dengan barang.
+- Logika di `public/js/app.js`: `muatSupplier` dan `muatPilihanTautan`, plus kirim kedua formulirnya. Pilihan supplier yang sedang dipilih dipertahankan sesudah daftar dimuat ulang.
+
+Cara kerja singkat:
+- Pemilik menambah supplier sekali, lalu menghubungkannya dengan barang yang biasa dibeli dari supplier itu. Sesudah itu daftar supplier di halaman langsung menunjukkan siapa menyuplai apa — pas stok menipis, tinggal lihat daftar peringatan Tahap 3 lalu cek supplier-nya di sini.
+
+## Tahap 5 — Selesai: Pencarian dan tampilan rapi di HP
+
+Yang dibuat kali ini:
+- Model `src/models/Produk.js`: `semuaProduk` sekarang menerima kata kunci — kalau ada, produk disaring dengan `LIKE` pada nama atau kategori. Tanda `%`, `_`, dan `\` diamankan dulu supaya dianggap huruf biasa, bukan pola. Sengaja tanpa klausa `ESCAPE` tambahan, sama seperti di kasir dan katalog (MariaDB pernah menolaknya dan bikin 500).
+- Pengatur `src/controllers/stokController.js`: `daftarStok` membaca kata kunci dari `?cari=`, dipangkas dan dibatasi 100 huruf. Pencarian dan saringan (semua/menipis/habis) boleh dipakai bareng.
+- Kolom pencarian di `public/index.html` di atas tombol saringan, tipe `search`. Di `public/js/app.js`, permintaan baru dikirim 300 ms sesudah berhenti mengetik (debounce), kata kunci dan saringan yang aktif disimpan di variabel supaya tidak saling menghapus. Kalau tidak ada yang cocok, muncul pesan "Tidak ada barang yang cocok dengan ...".
+- Perbaikan kecil sekalian: nama dan kategori produk di tabel stok sekarang diamankan dulu sebelum ditempel ke halaman (sebelumnya langsung ditempel, tidak seperti tabel riwayat yang sudah diamankan).
+- Tampilan HP di `public/css/style.css`: kedua tabel dibungkus `.bungkus-tabel` yang bisa digeser ke samping di layar kecil (kolom tidak kepotong), kolom pencarian setinggi 44px dengan huruf 16px supaya peramban HP tidak memperbesar layar saat disentuh, dan aturan layar sangat kecil (max-width 400px) membuat tabel lebih ringkas. Kartu angka memang sudah jadi dua kolom di layar kecil sejak Tahap 1.
+
+Yang sudah diuji untuk Tahap 3–5 (basis data MariaDB 10.11 lokal, server di port 3002):
+- Data uji: Kopi Sachet Rp5.000 (stok 20), Gula 1kg Rp17.000 (stok 3), Teh Melati Rp4.000 (stok 0), Mie Instan Rp3.500 (stok 50)
+- `GET /api/stok/perlu-dibeli` mengembalikan 2 barang dengan urutan benar: Teh Melati (0) dulu, lalu Gula 1kg (3)
+- `GET /api/stok?cari=kopi` mengembalikan 1 hasil (Kopi Sachet); `?cari=%` mengembalikan 0 hasil (tanda pola tidak dianggap pola); `?cari=minuman&saring=habis` mengembalikan Teh Melati — gabungan cari + saring jalan
+- `POST /api/supplier` dengan nama "Toko Sinar" 201 dan tersimpan; tanpa nama 400 "Nama supplier wajib diisi"
+- `POST /api/supplier/1/produk` (Kopi Sachet) 201; diulang tetap 201 dan hubungannya tidak dobel (jumlah_produk tetap 1); produk 999 dijawab 404; supplier 999 dijawab 404
+- `GET /api/supplier` mengembalikan Toko Sinar lengkap dengan nama_produk "Kopi Sachet"
+- Regresi: `POST /api/stok/masuk` Gula +10 (stok 3 jadi 13) 201, dan sesudah itu daftar perlu-dibeli tinggal Teh Melati saja; `/api/sehat`, halaman `/`, `/css/style.css`, dan `/js/app.js` semuanya 200; elemen kartu peringatan, kolom cari, dan kedua formulir supplier ada di halaman; tidak ada error di log server
+- Data uji dibersihkan, semua tabel kembali kosong, server dimatikan sesudah uji
+
+Kekurangan saat ini (jujur):
+- Supplier belum bisa diubah atau dihapus dari halaman, dan hubungan supplier–produk belum bisa dilepas dari halaman — endpointnya pun belum ada.
+- Daftar peringatan belum menampilkan supplier-nya sekalian; pemilik masih perlu cek bagian Supplier sendiri.
+- Klik formulir di peramban sungguhan belum diuji — yang diuji endpointnya lewat curl dan elemen halamannya; alur kirim formulirnya memakai fetch yang sama seperti kode tahap sebelumnya.
+- Belum ter-deploy — itu Tahap 6.
+
+## Tahap berikutnya
+
+Tahap 6: Deploy online — pola yang sama seperti aplikasi kasir (Railway, tabel kebikin sendiri pas server nyala sudah siap dari Tahap 1).

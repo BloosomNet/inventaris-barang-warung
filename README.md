@@ -10,9 +10,9 @@ Pemilik warung atau toko kecil. Selama ini stok cuma diingat-ingat atau dicatat 
 
 - [x] Tahap 1: Kerangka aplikasi dan daftar stok (ringkasan stok, saringan menipis/habis)
 - [x] Tahap 2: Barang masuk dan keluar (endpoint + formulir di halaman + tabel riwayat)
-- [ ] Tahap 3: Peringatan stok menipis yang lebih jelas
-- [ ] Tahap 4: Supplier sederhana (siapa yang nyuplai barang apa)
-- [ ] Tahap 5: Pencarian dan tampilan rapi di HP
+- [x] Tahap 3: Peringatan stok menipis yang lebih jelas (daftar "Perlu dibeli lagi" di atas halaman, dari yang paling mendesak)
+- [x] Tahap 4: Supplier sederhana (siapa yang nyuplai barang apa)
+- [x] Tahap 5: Pencarian dan tampilan rapi di HP (kolom cari gabung saringan, tabel bisa digeser di layar kecil)
 - [ ] Tahap 6: Deploy online
 
 ## Teknologi yang dipakai

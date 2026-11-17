@@ -1,31 +1,52 @@
 // Model Produk: semua perintah baca ke tabel produk dikumpulkan di sini.
-// Inventaris MEMBACA stok di tahap ini — tambah barang, barang masuk/keluar,
-// dan ubah stok dibuat di tahap berikutnya. Tabelnya sama persis dengan
-// tabel produk di kasir dan katalog, supaya nanti ketiganya bisa digabung.
+// Tabelnya sama persis dengan tabel produk di kasir dan katalog, supaya
+// nanti ketiganya bisa digabung.
 const pool = require('../config/database');
 
 // Batas stok menipis: 5 ke bawah (tapi masih di atas nol) dianggap menipis.
 // Angka ini dipakai di mana-mana, jadi ditaruh di sini saja.
 const BATAS_MENIPIS = 5;
 
+// Kata kunci pencarian diamankan dulu: tanda %, _, dan \ dianggap huruf
+// biasa, bukan pola LIKE. Sama seperti di kasir dan katalog — sengaja
+// tanpa klausa ESCAPE tambahan, karena MariaDB pernah menolaknya (500).
+function amankanPola(cari) {
+  return cari.replace(/[%_\\]/g, (tanda) => '\\' + tanda);
+}
+
 // Mengambil semua produk, diurutkan berdasarkan nama.
 // Saringannya: 'semua' (bawaan), 'menipis' (stok 1 sampai 5),
-// atau 'habis' (stok 0).
-async function semuaProduk(saringan) {
+// atau 'habis' (stok 0). Kata kunci cari (boleh kosong) mencocokkan
+// nama atau kategori, dan boleh dipakai bareng saringan.
+async function semuaProduk(saringan, cari) {
+  const syarat = [];
+  const nilai = [];
   if (saringan === 'menipis') {
-    const [baris] = await pool.query(
-      'SELECT * FROM produk WHERE stok > 0 AND stok <= ? ORDER BY nama ASC',
-      [BATAS_MENIPIS]
-    );
-    return baris;
+    syarat.push('stok > 0 AND stok <= ?');
+    nilai.push(BATAS_MENIPIS);
+  } else if (saringan === 'habis') {
+    syarat.push('stok = 0');
   }
-  if (saringan === 'habis') {
-    const [baris] = await pool.query(
-      'SELECT * FROM produk WHERE stok = 0 ORDER BY nama ASC'
-    );
-    return baris;
+  if (cari) {
+    syarat.push('(nama LIKE ? OR kategori LIKE ?)');
+    const pola = '%' + amankanPola(cari) + '%';
+    nilai.push(pola, pola);
   }
-  const [baris] = await pool.query('SELECT * FROM produk ORDER BY nama ASC');
+  const klausa = syarat.length ? ' WHERE ' + syarat.join(' AND ') : '';
+  const [baris] = await pool.query(
+    'SELECT * FROM produk' + klausa + ' ORDER BY nama ASC',
+    nilai
+  );
+  return baris;
+}
+
+// Daftar belanja: produk yang perlu dibeli lagi — stoknya habis atau
+// menipis — diurutkan dari yang paling mendesak (stok paling kecil dulu).
+async function perluDibeli() {
+  const [baris] = await pool.query(
+    'SELECT * FROM produk WHERE stok <= ? ORDER BY stok ASC, nama ASC',
+    [BATAS_MENIPIS]
+  );
   return baris;
 }
 
@@ -45,4 +66,4 @@ async function ringkasanStok() {
   return baris[0];
 }
 
-module.exports = { semuaProduk, ringkasanStok, BATAS_MENIPIS };
+module.exports = { semuaProduk, ringkasanStok, perluDibeli, BATAS_MENIPIS };

@@ -30,24 +30,34 @@
       </div>
     </div>
 
+    <div class="kartu kartu-peringatan" id="kartu-peringatan" hidden>
+      <h2>⚠️ Perlu dibeli lagi</h2>
+      <p class="keterangan">Barang di bawah ini stoknya sudah habis atau menipis — paling atas yang paling mendesak.</p>
+      <ul class="daftar-peringatan" id="daftar-peringatan"></ul>
+    </div>
+    <p class="keterangan" id="stok-aman" hidden>Semua stok masih aman, belum ada yang perlu dibeli lagi.</p>
+
     <div class="kartu">
+      <input type="search" id="cari" class="pencarian" placeholder="Cari barang, misal kopi..." maxlength="100">
       <div class="saringan" id="saringan">
         <button class="tombol-saring aktif" data-saring="">Semua</button>
         <button class="tombol-saring" data-saring="menipis">Menipis</button>
         <button class="tombol-saring" data-saring="habis">Habis</button>
       </div>
       <p id="pesan" class="pesan"></p>
-      <table class="tabel">
-        <thead>
-          <tr>
-            <th>Barang</th>
-            <th>Kategori</th>
-            <th>Harga</th>
-            <th>Stok</th>
-          </tr>
-        </thead>
-        <tbody id="daftar-stok"></tbody>
-      </table>
+      <div class="bungkus-tabel">
+        <table class="tabel">
+          <thead>
+            <tr>
+              <th>Barang</th>
+              <th>Kategori</th>
+              <th>Harga</th>
+              <th>Stok</th>
+            </tr>
+          </thead>
+          <tbody id="daftar-stok"></tbody>
+        </table>
+      </div>
       <p id="kosong" class="keterangan" hidden>Belum ada barang di sini.</p>
     </div>
 
@@ -88,23 +98,62 @@
     <div class="kartu">
       <h2>Riwayat pergerakan stok</h2>
       <p id="pesan-riwayat" class="pesan"></p>
-      <table class="tabel">
-        <thead>
-          <tr>
-            <th>Waktu</th>
-            <th>Barang</th>
-            <th>Jenis</th>
-            <th>Jumlah</th>
-            <th>Harga beli</th>
-            <th>Keterangan</th>
-          </tr>
-        </thead>
-        <tbody id="daftar-riwayat"></tbody>
-      </table>
+      <div class="bungkus-tabel">
+        <table class="tabel">
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Barang</th>
+              <th>Jenis</th>
+              <th>Jumlah</th>
+              <th>Harga beli</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody id="daftar-riwayat"></tbody>
+        </table>
+      </div>
       <p id="riwayat-kosong" class="keterangan" hidden>Belum ada barang masuk atau keluar.</p>
     </div>
 
-    <p class="keterangan">Daftar supplier menyusul di tahap berikutnya.</p>
+    <div class="kartu">
+      <h2>Supplier</h2>
+      <p class="keterangan">Siapa yang menyuplai barang apa — biar pas stok menipis, langsung tahu mau pesan ke siapa.</p>
+      <form id="form-supplier" class="formulir">
+        <label class="kolom">
+          <span>Nama supplier</span>
+          <input type="text" id="supplier-nama" maxlength="100" placeholder="misal Toko Sinar" required>
+        </label>
+        <label class="kolom">
+          <span>Kontak (boleh kosong)</span>
+          <input type="text" id="supplier-kontak" maxlength="100" placeholder="nomor WA atau telepon">
+        </label>
+        <label class="kolom">
+          <span>Alamat (boleh kosong)</span>
+          <input type="text" id="supplier-alamat" maxlength="255" placeholder="alamat toko atau pasar">
+        </label>
+        <button type="submit" class="tombol-utama">Tambah supplier</button>
+      </form>
+      <p id="pesan-supplier" class="pesan"></p>
+      <div id="daftar-supplier"></div>
+      <p id="supplier-kosong" class="keterangan" hidden>Belum ada supplier. Tambahkan lewat formulir di atas.</p>
+      <form id="form-tautan" class="formulir">
+        <label class="kolom">
+          <span>Supplier</span>
+          <select id="tautan-supplier" required>
+            <option value="">Pilih supplier dulu</option>
+          </select>
+        </label>
+        <label class="kolom">
+          <span>Barang yang disuplai</span>
+          <select id="tautan-produk" required>
+            <option value="">Pilih barang dulu</option>
+          </select>
+        </label>
+        <button type="submit" class="tombol-utama">Hubungkan</button>
+      </form>
+      <p id="pesan-tautan" class="pesan"></p>
+    </div>
   </div>
 
   <script src="/js/app.js"></script>

@@ -19,15 +19,29 @@ function produkIdValid(nilai) {
 }
 
 // GET /api/stok — daftar produk beserta stoknya.
-// Boleh disaring dengan ?saring=menipis atau ?saring=habis,
-// misalnya /api/stok?saring=menipis
+// Boleh disaring dengan ?saring=menipis atau ?saring=habis, dan boleh
+// dicari dengan ?cari=kopi — keduanya boleh dipakai bareng,
+// misalnya /api/stok?saring=menipis&cari=kopi
 async function daftarStok(req, res) {
   try {
-    const produk = await Produk.semuaProduk(req.query.saring);
+    const cari = String(req.query.cari || '').trim().slice(0, 100) || null;
+    const produk = await Produk.semuaProduk(req.query.saring, cari);
     res.json({ produk, batasMenipis: Produk.BATAS_MENIPIS });
   } catch (err) {
     console.error(err);
     res.status(500).json({ pesan: 'Gagal mengambil daftar stok' });
+  }
+}
+
+// GET /api/stok/perlu-dibeli — daftar belanja: barang yang stoknya habis
+// atau menipis, dari yang paling mendesak.
+async function perluDibeli(req, res) {
+  try {
+    const produk = await Produk.perluDibeli();
+    res.json({ produk, batasMenipis: Produk.BATAS_MENIPIS });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ pesan: 'Gagal mengambil daftar perlu dibeli' });
   }
 }
 
@@ -42,7 +56,7 @@ async function ringkasan(req, res) {
   }
 }
 
-module.exports = { daftarStok, ringkasan, barangMasuk, barangKeluar, riwayat };
+module.exports = { daftarStok, ringkasan, perluDibeli, barangMasuk, barangKeluar, riwayat };
 
 // POST /api/stok/masuk — barang masuk: stok produk nambah, pergerakannya
 // dicatat di riwayat. Badannya: produk_id, jumlah, harga_beli (boleh

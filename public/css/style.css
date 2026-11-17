@@ -207,3 +207,83 @@ h1 {
   .tabel th,
   .tabel td { padding: 8px 6px; }
 }
+
+/* Kartu peringatan perlu dibeli: tepinya kuning tegas biar langsung kelihatan. */
+.kartu-peringatan {
+  border: 2px solid #b7791f;
+  background: #fffaf0;
+}
+
+.kartu-peringatan h2 { color: #8a5a12; }
+
+.daftar-peringatan {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.daftar-peringatan li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0e2c4;
+}
+
+.daftar-peringatan li:last-child { border-bottom: none; }
+
+.daftar-peringatan .sisa { color: #6b645a; }
+
+.lencana {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lencana-habis { background: #fdecea; color: #c0392b; }
+.lencana-menipis { background: #fdf3d7; color: #8a5a12; }
+
+/* Kolom pencarian di atas daftar stok. */
+.pencarian {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid #d8d0c0;
+  border-radius: 8px;
+  background: #fff;
+  color: #26221c;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.pencarian:focus {
+  outline: 2px solid #2e7d32;
+  outline-offset: 1px;
+}
+
+/* Tabel dibungkus supaya bisa digeser ke samping di layar kecil,
+   bukan memotong kolomnya. */
+.bungkus-tabel { overflow-x: auto; }
+
+/* Kartu supplier di daftar supplier. */
+.kartu-supplier {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee7d8;
+}
+
+.kartu-supplier .kontak { color: #6b645a; font-size: 14px; }
+.kartu-supplier .suplai { font-size: 14px; }
+
+#form-tautan { margin-top: 16px; }
+
+/* Layar sangat kecil: kartu angka tetap dua kolom, tabel lebih ringkas. */
+@media (max-width: 400px) {
+  .tabel { font-size: 13px; }
+  .daftar-peringatan li { gap: 6px; }
+}

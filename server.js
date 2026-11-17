@@ -1,7 +1,6 @@
 // Titik masuk aplikasi: menjalankan server Express dan melayani halaman inventaris.
-// Tahap 1: kerangka + daftar stok. Tahap 2 potongan 1: endpoint barang
-// masuk/keluar + riwayat sudah jalan, formulir di halaman menyusul.
-// Stok menipis yang lebih detail dan supplier dibuat di tahap berikutnya.
+// Tahap 1: kerangka + daftar stok. Tahap 2: barang masuk/keluar + riwayat.
+// Tahap 3: daftar perlu dibeli. Tahap 4: supplier. Tahap 5: pencarian.
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -24,6 +23,9 @@ app.get('/api/sehat', async (req, res) => {
 
 // Rute stok barang.
 app.use('/api/stok', require('./src/routes/stok'));
+
+// Rute supplier.
+app.use('/api/supplier', require('./src/routes/supplier'));
 
 // Tabel dibuat dulu sebelum server menerima permintaan, supaya
 // endpoint langsung bisa dipakai tanpa jalanin schema.sql manual.

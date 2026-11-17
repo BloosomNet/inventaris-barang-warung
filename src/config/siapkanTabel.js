@@ -24,6 +24,23 @@ const buatTabel = [
     keterangan VARCHAR(255) NULL,
     dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`,
+  // Supplier: siapa yang menyuplai barang ke warung.
+  `CREATE TABLE IF NOT EXISTS supplier (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nama VARCHAR(100) NOT NULL,
+    kontak VARCHAR(100) NULL,
+    alamat VARCHAR(255) NULL,
+    dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`,
+  // Hubungan supplier dengan produk yang disuplainya. Satu pasangan
+  // cuma boleh sekali, makanya ada kunci uniknya.
+  `CREATE TABLE IF NOT EXISTS supplier_produk (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    supplier_id INT NOT NULL,
+    produk_id INT NOT NULL,
+    dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unik_supplier_produk (supplier_id, produk_id)
+  )`,
 ];
 
 // Coba bikin tabel, kalau basis data belum siap (misal MySQL Railway
