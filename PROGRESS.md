@@ -153,3 +153,35 @@ Kekurangan saat ini (jujur):
 ## Tahap berikutnya
 
 Tahap 6: Deploy online — pola yang sama seperti aplikasi kasir (Railway, tabel kebikin sendiri pas server nyala sudah siap dari Tahap 1).
+
+## Persiapan Tahap 6 — Deploy (menunggu persetujuan)
+
+Kesiapan deploy sudah diperiksa (18 Nov 2026):
+- `server.js` membaca port dari env `PORT` (Railway mengisinya otomatis) dan menjalankan `siapkanTabel()` sebelum listen — tabel kebikin sendiri pas server nyala, sama seperti pola kasir dan katalog.
+- `package.json` punya script `start`. `.env` tertutup `.gitignore`. Tidak ada perubahan kode yang dibutuhkan buat deploy.
+- Uji lokal ulang 18 Nov (MariaDB 10.11, port 3002): server sehat (`/api/sehat` ok), halaman utama tampil penuh dengan data contoh (ringkasan, peringatan stok habis, tabel stok, formulir masuk/keluar, riwayat, supplier) — sudah dilihat dan disetujui user lewat screenshot.
+
+Yang belum dilakukan (menunggu persetujuan user, sesuai gerbang QC):
+- Membuat service Railway buat repo ini + service MySQL-nya, mengisi env DB, dan deploy beneran.
+- Sesudah demo live terverifikasi: centang Tahap 6 di README + tulis link demo, lalu push dokumentasi penutup.
+
+## Tahap 6 — Selesai: Deploy online (18 Nov 2026)
+
+Yang dilakukan:
+- Service `inventaris-barang-warung` dibuat di Railway (project yang sama dengan kasir dan katalog) dari repo ini, branch main, dan domain publik dibuat: https://inventaris-barang-warung-production.up.railway.app
+- Kendala: MySQL service terpisah TIDAK bisa ditambahkan — Railway menolak dengan pesan "Free plan resource provision limit exceeded" (batas jumlah resource plan gratis/Trial sudah mentok). Sesudah pilihan user, aplikasi memakai instance MySQL katalog yang sudah ada dengan database terpisah sendiri `inventaris_warung` — data katalog tidak disentuh. Env aplikasi diisi sebagai referensi Railway ke service MySQL itu (DB_HOST/DB_PORT/DB_USER/DB_PASSWORD) + DB_NAME=inventaris_warung.
+- Tabel kebikin otomatis pas server pertama nyala (pola siapkanTabel), terverifikasi: produk, riwayat_stok, supplier, supplier_produk.
+- Demo diisi data contoh lewat editor query Railway (aplikasi memang tidak punya endpoint tambah produk — produk berasal dari data kasir): 5 barang, 2 supplier + 3 hubungan supplier–produk, 4 catatan riwayat (2 masuk, 2 keluar).
+
+Yang sudah diuji (live, 18 Nov 2026):
+- `GET /api/sehat` → ok; `GET /api/stok/ringkasan` → 5 produk, total stok 89, menipis 0, habis 1.
+- `GET /api/stok`, `/api/stok/riwayat`, `/api/supplier` mengembalikan data contoh dengan benar; halaman utama tampil penuh (kartu ringkasan, peringatan Minyak Goreng habis, tabel stok, riwayat, supplier) — bukti screenshot dilihat user.
+- Katalog (tetangga satu MySQL) dicek ulang sesudah perubahan: tetap normal, produknya utuh.
+
+Kekurangan saat ini (jujur):
+- Satu instance MySQL dipakai dua aplikasi (database tetap terpisah). Kalau nanti plan Railway di-upgrade, inventaris bisa dipindah ke MySQL sendiri tanpa ubah kode — cukup ganti env.
+- Kekurangan lama Tahap 3–5 masih berlaku (supplier belum bisa diubah/dihapus dari halaman, dsb.).
+
+## Tahap berikutnya
+
+Semua tahap selesai. Pengembangan berikutnya mengikuti fase penggabungan di repo `sistem-manajemen-umkm`.

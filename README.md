@@ -13,7 +13,7 @@ Pemilik warung atau toko kecil. Selama ini stok cuma diingat-ingat atau dicatat 
 - [x] Tahap 3: Peringatan stok menipis yang lebih jelas (daftar "Perlu dibeli lagi" di atas halaman, dari yang paling mendesak)
 - [x] Tahap 4: Supplier sederhana (siapa yang nyuplai barang apa)
 - [x] Tahap 5: Pencarian dan tampilan rapi di HP (kolom cari gabung saringan, tabel bisa digeser di layar kecil)
-- [ ] Tahap 6: Deploy online
+- [x] Tahap 6: Deploy online
 
 ## Teknologi yang dipakai
 
@@ -54,7 +54,9 @@ Pemilik warung atau toko kecil. Selama ini stok cuma diingat-ingat atau dicatat 
 
 ## Demo
 
-Belum ter-deploy. Tautan demo akan ditulis di sini setelah tahap deploy selesai.
+Tersedia online: https://inventaris-barang-warung-production.up.railway.app
+
+Di-deploy ke Railway (Node.js + MySQL). Demo sudah diisi data contoh (5 barang, 2 supplier, beberapa catatan stok masuk/keluar) supaya halaman langsung kelihatan hidup. Catatan teknis: karena batas jumlah resource di plan Railway yang dipakai, aplikasi ini memakai instance MySQL yang sama dengan katalog-produk-warung, tapi databasenya terpisah sendiri (`inventaris_warung`).
 
 ## Kemajuan
 
